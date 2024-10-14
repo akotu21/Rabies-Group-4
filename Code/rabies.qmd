@@ -15,14 +15,21 @@ Your goals are twofold:
 
 ## Set things up and read in the data
 
+```{r}
+rm(list=ls())
+library(here)
+library(tidyverse)
+```
+
+
+
 Add the code to set up the workspace
 
 Now read in the data and name it as an object called `rabies`.
 ```{r}
-rm(list = ls())
-library(here)
-library(tidyverse)
-rabies <- read.csv(here("Data","Rabies_Laboratory_Submissions.csv"))
+
+rabies<- read.csv(here("Data", "Rabies_Laboratory_Submissions.csv"))
+
 ```
 
 
@@ -32,12 +39,21 @@ Use a combination of filter, select, slice, arrange, group_by, summarize, mutate
 
 1.  After you read in all of the data, create a new data frame called rabies that includes just the first 7 columns (omit latitude, longitude and geocode information) from the original dataset.
 ```{r}
-rabies <- rabies |> 
-  select(1:7)
+
+rabies<- rabies |> select(1:7)
+
 ```
 
 
 2.  Create a new column in your dataset called "Percent_pos" and set it equal to (number of positive samples / number of samples)\*100.
+```{r}
+rabies |> reframe(Percent_pos = (Positive.Samples/Number.of.Samples)* 100) |>
+  mutate(Percent_pos= Percent_pos)
+```
+
+```{r}
+rabies<- rabies |> mutate(Percent_pos = Positive.Samples/ Number.of.Samples *100)
+```
 
 ```{r}
 rabies <- rabies |> 
@@ -49,11 +65,28 @@ rabies <- rabies |>
 
 3.  In what year was the highest total number of sample submissions received? (Hint: you might want the `sum()` function)
 
+
 4.  In what year and in what county was the highest positive number of samples received?
 
+
 5.  How many rows of data are there that include submissions from bats for which the samples were positive for rabies? For which the samples were not positive for rabies?
+```{r}
+rabies |> filter(Positive.Samples > 0) |>
+  nrow()
+
+rabies |> filter(Positive.Samples == 0) |>
+  nrow()
+```
+
 
 6.  How many animal types were there for which, in instances in which there were more than 4 samples submitted at a time, the percent of positive samples was greater than 50%?
+```{r}
+rabies |> filter(Number.of.Samples > 4 ) |>
+  filter(Percent_pos > 50) |>
+  group_by(Animal.Classification) |>
+  nrow()
+```
+
 
 7.  Create a new dataset that includes only data from St. Lawrence County and name it SLC. Next, calculate, by Animal.Classification, the total number of submissions per year, the total number of positive submissions per year, and then the percent positive per year based on those two totals. Save your results in a new data frame called SLC_animals.
 
